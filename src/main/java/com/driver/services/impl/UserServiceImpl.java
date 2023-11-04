@@ -29,22 +29,27 @@ public class UserServiceImpl implements UserService{
         User user=new User();
         user.setUsername(username);
         user.setPassword(password);
-        user.setConnected(false);
-        Country country=new Country();
-        try{
-            country.enrich(countryName);
-        }catch(Exception e){
-            throw new Exception("Country not found");
+
+        List<Country> countryList = countryRepository3.findAll();
+        String countryCode = "";
+
+        for(Country country : countryList){
+            if(country.getCountryName().equals(countryName)){
+                user.setOriginalCountry(country);
+                countryCode = country.getCode();
+                break;
+            }
         }
-        //set fk variable
-        country.setUser(user);
-        user.setOriginalCountry(country);
 
-        user=userRepository3.save(user); //this is for user id assign
-        user.setOriginalIp(new String(user.getOriginalCountry().getCode()+"."+user.getId()));
+        User user1 = userRepository3.save(user);
 
-        //bidirectional mapping here
-        return userRepository3.save(user);
+        String originalIp = countryCode + "." + user1.getId();
+
+        user.setOriginalIp(originalIp);
+
+        userRepository3.save(user);
+
+        return user;
     }
 
 
@@ -53,19 +58,11 @@ public class UserServiceImpl implements UserService{
         User user=userRepository3.findById(userId).get();
         ServiceProvider serviceProvider=serviceProviderRepository3.findById(serviceProviderId).get();
 
-        List<ServiceProvider> serviceProviderList=user.getServiceProviderList();
-        List<User>userList=serviceProvider.getUsers();
+        user.getServiceProviderList().add(serviceProvider);
+        serviceProvider.getUsers().add(user);
 
-        serviceProviderList.add(serviceProvider);
-        userList.add(user);
-        //fk set
-        user.setServiceProviderList(serviceProviderList); // user fk set
+        userRepository3.save(user);
 
-        //bidirectional mapping
-        serviceProviderRepository3.save(serviceProvider);
-        serviceProvider.setUsers(userList); //service provider fk set
-        //bidirectional saving
-        serviceProviderRepository3.save(serviceProvider);
         return user;
     }
 }
