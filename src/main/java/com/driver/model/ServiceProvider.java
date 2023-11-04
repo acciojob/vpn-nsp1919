@@ -37,6 +37,10 @@ public class ServiceProvider {
         this.users = users;
         this.countryList = countryList;
     }
+    public ServiceProvider(String name , Admin admin) {
+        this.name = name;
+        this.admin = admin;
+    }
 
     public Integer getId() {
         return id;

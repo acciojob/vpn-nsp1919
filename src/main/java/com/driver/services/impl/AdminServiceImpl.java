@@ -29,14 +29,15 @@ public class AdminServiceImpl implements AdminService {
         Admin admin=new Admin();
         admin.setUsername(username);
         admin.setPassword(password);
-        return adminRepository1.save(admin);
+        adminRepository1.save(admin);
+        return admin;
     }
 
 
     @Override
     public Admin addServiceProvider(int adminId, String providerName) {
         Admin admin=adminRepository1.findById(adminId).get();
-        ServiceProvider serviceProvider=new ServiceProvider();
+        ServiceProvider serviceProvider=new ServiceProvider(providerName,admin);
 
 //        serviceProvider.setName(providerName);
 //        //set fk valiables

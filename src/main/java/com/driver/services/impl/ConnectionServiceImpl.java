@@ -23,10 +23,9 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public User connect(int userId, String countryName) throws Exception{
         User user = userRepository2.findById(userId).get();
-        if(!userRepository2.existsById(userId)) throw new Exception("Unable to connect");
-
-        else if (user.getConnected()) throw new Exception("Already connected");
-        else{
+        if (user.getMaskedIp() != null) throw new Exception("Already connected");
+        else if (user.getOriginalCountry().getCountryName().toString().equalsIgnoreCase(countryName)) return user;
+        else {
             if (user.getServiceProviderList() == null) {
                 throw new Exception("Unable to connect");
             } else {
@@ -86,7 +85,6 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public User communicate(int senderId, int receiverId) throws Exception {
-        if(!userRepository2.existsById(receiverId)) throw new Exception("Cannot establish communication");
         User receiver = userRepository2.findById(receiverId).get();
         User sender = userRepository2.findById(senderId).get();
         if (receiver.getMaskedIp() != null) {
