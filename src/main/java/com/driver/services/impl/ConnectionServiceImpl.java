@@ -4,13 +4,14 @@ import com.driver.model.*;
 import com.driver.repository.ConnectionRepository;
 import com.driver.repository.ServiceProviderRepository;
 import com.driver.repository.UserRepository;
+import com.driver.services.ConnectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class ConnectionServiceImpl{
+public class ConnectionServiceImpl implements ConnectionService {
     @Autowired
     UserRepository userRepository2;
     @Autowired
@@ -19,6 +20,7 @@ public class ConnectionServiceImpl{
     ConnectionRepository connectionRepository2;
 
 
+    @Override
     public User connect(int userId, String countryName) throws Exception{
         if(!userRepository2.existsById(userId)) throw new Exception("Unable to connect");
         User user = userRepository2.findById(userId).get();
@@ -67,6 +69,7 @@ public class ConnectionServiceImpl{
 
     }
 
+    @Override
     public User disconnect(int userId) throws Exception {
         if(!userRepository2.existsById(userId)) throw new Exception("Already disconnected");
         User user =userRepository2.findById(userId).get();
@@ -82,6 +85,7 @@ public class ConnectionServiceImpl{
 
     }
 
+    @Override
     public User communicate(int senderId, int receiverId) throws Exception {
         if(!userRepository2.existsById(receiverId)) throw new Exception("Cannot establish communication");
         User receiver = userRepository2.findById(receiverId).get();
