@@ -2,6 +2,7 @@ package com.driver.services.impl;
 
 import com.driver.model.Admin;
 import com.driver.model.Country;
+import com.driver.model.CountryName;
 import com.driver.model.ServiceProvider;
 import com.driver.repository.AdminRepository;
 import com.driver.repository.CountryRepository;
@@ -51,16 +52,25 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public ServiceProvider addCountry(int serviceProviderId, String countryName) throws Exception{
-        if(!serviceProviderRepository1.existsById(serviceProviderId)) throw new Exception("Country not found");
-        ServiceProvider serviceProvider=serviceProviderRepository1.findById(serviceProviderId).get();
-        Country country=new Country();
-        country.enrich(countryName);
-        //set fk variable
-        country.setServiceProvider(serviceProvider);
-        serviceProvider.getCountryList().add(country);
+        Country country = new Country();
+        ServiceProvider serviceProvider = serviceProviderRepository1.findById(serviceProviderId).get();
 
-        //bi_directional mapping
-        serviceProvider=serviceProviderRepository1.save(serviceProvider);
+        countryName = countryName.toUpperCase();
+
+        boolean countryNameIsPresent = false;
+        for (CountryName countryName1 : CountryName.values()){
+            if(countryName1.equals(countryName)){
+                countryNameIsPresent = true;
+                country.setCountryName(countryName1);
+                country.setCode(countryName1.toCode());
+            }
+        }
+
+        if(!countryNameIsPresent)throw new Exception("Country not found");
+
+        country.setServiceProvider(serviceProvider);
+        serviceProviderRepository1.save(serviceProvider);
+
         return serviceProvider;
     }
 }
